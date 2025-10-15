@@ -5,12 +5,12 @@
 *    License     : http://www.gnu.org/licenses/gpl.txt  GNU GPL 3.0
 *    Date        : Mayo 2025
 *    Status      : Prototype
-*    Iteration   : 3.0 ( prototype )
+*    Iteration   : 1.0 ( prototype )
 */
 
-import { studentsAPI } from '../api/studentsAPI.js';
-import { subjectsAPI } from '../api/subjectsAPI.js';
-import { studentsSubjectsAPI } from '../api/studentsSubjectsAPI.js';
+import { studentsAPI } from '../apiConsumers/studentsAPI.js';
+import { subjectsAPI } from '../apiConsumers/subjectsAPI.js';
+import { studentsSubjectsAPI } from '../apiConsumers/studentsSubjectsAPI.js';
 
 document.addEventListener('DOMContentLoaded', () => 
 {
