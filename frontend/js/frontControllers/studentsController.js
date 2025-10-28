@@ -71,7 +71,7 @@ function setupPaginationControls()
             currentPage--;
             loadStudents();
         }
-    });
+    }); 
 
     document.getElementById('nextPage').addEventListener('click', () => 
     {

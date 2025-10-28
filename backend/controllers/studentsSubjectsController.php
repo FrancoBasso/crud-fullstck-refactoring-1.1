@@ -12,9 +12,31 @@
 require_once("./repositories/studentsSubjects.php");
 
 function handleGet($conn) 
-{
+{ if (isset($_GET['id'])) {
+
     $studentsSubjects = getAllSubjectsStudents($conn);
     echo json_encode($studentsSubjects);
+}//2.0
+    else if (isset($_GET['page']) && isset($_GET['limit'])) 
+    {
+        $page = (int)$_GET['page'];
+        $limit = (int)$_GET['limit'];
+        $offset = ($page - 1) * $limit;
+
+        $studentsSubjects = getPaginatedStudentSubjects($conn, $limit, $offset);
+        $total = getTotalStudentSubject($conn);
+
+        echo json_encode([
+            'studentsSubjects' => $studentsSubjects, // ya es array
+            'total' => $total        // ya es entero
+        ]);
+    }
+    else
+    {
+        $studentsSubjects= getAllSubjectsStudents($conn); // ya es array
+        echo json_encode($studentsSubjects);
+    }
+      
 }
 
 function handlePost($conn) 

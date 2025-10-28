@@ -11,12 +11,17 @@
 import { studentsAPI } from '../apiConsumers/studentsAPI.js';
 import { subjectsAPI } from '../apiConsumers/subjectsAPI.js';
 import { studentsSubjectsAPI } from '../apiConsumers/studentsSubjectsAPI.js';
-
+//2.0
+//For pagination:
+let currentPage = 1;
+let totalPages = 1;
+const limit = 5;
 document.addEventListener('DOMContentLoaded', () => 
 {
     initSelects();
     setupFormHandler();
     setupCancelHandler();
+    setupPaginationControls();//2.0
     loadRelations();
 });
 
@@ -89,6 +94,33 @@ function setupCancelHandler()
         document.getElementById('relationId').value = '';
     });
 }
+//2.0
+function setupPaginationControls() 
+{
+    document.getElementById('prevPage').addEventListener('click', () => 
+    {
+        if (currentPage > 1) 
+        {
+            currentPage--;
+            loadRelations();
+        }
+    }); 
+
+    document.getElementById('nextPage').addEventListener('click', () => 
+    {
+        if (currentPage < totalPages) 
+        {
+            currentPage++;
+            loadRelations();
+        }
+    });
+
+    document.getElementById('resultsPerPage').addEventListener('change', e => 
+    {
+        currentPage = 1;
+        loadRelations();
+    });
+}
 
 function getFormData() 
 {
@@ -111,7 +143,12 @@ async function loadRelations()
     try 
     {
         const relations = await studentsSubjectsAPI.fetchAll();
-        
+        const resPerPage = parseInt(document.getElementById('resultsPerPage').value, 10) || limit;
+                const data = await studentsSubjectsAPI.fetchPaginated(currentPage, resPerPage);
+                console.log(data);
+                renderRelationsTable(data.relations);
+                totalPages = Math.ceil(data.total / resPerPage);
+                document.getElementById('pageInfo').textContent = `Página ${currentPage} de ${totalPages}`;
         /**
          * DEBUG
          */
