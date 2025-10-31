@@ -6,7 +6,7 @@
 *    License     : http://www.gnu.org/licenses/gpl.txt  GNU GPL 3.0
 *    Date        : Mayo 2025
 *    Status      : Prototype
-*    Iteration   : 3.0 ( prototype )
+*    Iteration   : 1.0 ( prototype )
 */
 
 function getAllSubjects($conn) 
@@ -15,7 +15,23 @@ function getAllSubjects($conn)
 
     return $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 }
+//2.0
+function getPaginatedSubjects($conn, $limit, $offset) 
+{
+    $stmt = $conn->prepare("SELECT * FROM subjects LIMIT ? OFFSET ?");
+    $stmt->bind_param("ii", $limit, $offset);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
 
+//2.0
+function getTotalSubjects($conn) 
+{
+    $sql = "SELECT COUNT(*) AS total FROM subjects";
+    $result = $conn->query($sql);
+    return $result->fetch_assoc()['total'];
+}
 function getSubjectById($conn, $id) 
 {
     $sql = "SELECT * FROM subjects WHERE id = ?";
