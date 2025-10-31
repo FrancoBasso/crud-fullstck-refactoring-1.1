@@ -137,7 +137,7 @@ function clearForm()
     document.getElementById('relationForm').reset();
     document.getElementById('relationId').value = '';
 }
-
+//2.0
 async function loadRelations() 
 {
     try 
@@ -146,7 +146,7 @@ async function loadRelations()
         const resPerPage = parseInt(document.getElementById('resultsPerPage').value, 10) || limit;
                 const data = await studentsSubjectsAPI.fetchPaginated(currentPage, resPerPage);
                 console.log(data);
-                renderRelationsTable(data.relations);
+                renderRelationsTable(data.studentsSubjects);
                 totalPages = Math.ceil(data.total / resPerPage);
                 document.getElementById('pageInfo').textContent = `Página ${currentPage} de ${totalPages}`;
         /**

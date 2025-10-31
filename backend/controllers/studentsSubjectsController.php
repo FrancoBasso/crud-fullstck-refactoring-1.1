@@ -12,11 +12,14 @@
 require_once("./repositories/studentsSubjects.php");
 
 function handleGet($conn) 
-{ if (isset($_GET['id'])) {
+{
+    
+     if (isset($_GET['id'])) 
+    {
 
     $studentsSubjects = getAllSubjectsStudents($conn);
     echo json_encode($studentsSubjects);
-}//2.0
+    }//2.0
     else if (isset($_GET['page']) && isset($_GET['limit'])) 
     {
         $page = (int)$_GET['page'];
