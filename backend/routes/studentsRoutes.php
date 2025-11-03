@@ -12,8 +12,34 @@ require_once("./config/databaseConfig.php");
 require_once("./routes/routesFactory.php");
 require_once("./controllers/studentsController.php");
 
-routeRequest($conn);
+// routeRequest($conn);
 
+routeRequest($conn,[
+    'POST' => function($conn){
+       $input = json_decode(file_get_contents("php://input"), true);
+       if (empty($input['email']))
+       {
+        http_response_code(400);
+        echo json_encode(["error" => "Correo electrónico obligatorio"]);
+        return; 
+       }  
+      $email = trim(strtolower($input['email']));
+      
+      $stmt = $conn->prepare("SELECT id FROM students WHERE email = ?");
+      $stmt->execute([$email]);
+      $exists = $stmt->fetch();
+
+      if ($exists) {
+            http_response_code(409); // Conflict
+            echo json_encode(["error" => "El correo electrónico ya está registrado"]);
+            return;
+        }
+
+        // Si pasa las validaciones, proceder con la creación
+        handlePost($conn);
+    }
+  ]};
+             
 /**
  * Ejemplo de como se extiende un archivo de rutas 
  * para casos particulares
