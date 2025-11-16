@@ -43,6 +43,19 @@ function getSubjectById($conn, $id)
     return $result->fetch_assoc(); 
 }
 
+function getSubjectByName($conn, $name) 
+{
+    // Asumimos que la columna se llama 'name' o 'fullname'
+    // ¡CAMBIALO por el nombre correcto de tu columna!
+    $stmt = $conn->prepare("SELECT * FROM subjects WHERE name = ?");
+    $stmt->bind_param("s", $name);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    // fetch_assoc() devuelve null automáticamente si no hay filas
+    return $result->fetch_assoc(); 
+}
+
 function createSubject($conn, $name) 
 {
     $sql = "INSERT INTO subjects (name) VALUES (?)";

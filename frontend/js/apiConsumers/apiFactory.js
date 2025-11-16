@@ -21,7 +21,23 @@ export function createAPI(moduleName, config = {})
             body: JSON.stringify(data)
         });
 
-        if (!res.ok) throw new Error(`Error en ${method}`);
+        /* if (!res.ok) throw new Error(`Error en ${method}`); */
+        if (!res.ok) 
+        {
+            let errorData;
+            try {
+                // 1. Intentamos leer el JSON que nos mandó el backend
+                errorData = await res.json();
+            } catch (e) {
+                // 2. Si el backend mandó un error 500 (con HTML) o algo no-JSON
+                errorData = { error: `Error ${res.status}: ${res.statusText}` };
+            }
+            
+            // 3. Lanzamos el error con el mensaje del backend
+            throw new Error(errorData.error || `Error en ${method}`);
+        }
+
+        // 4. Si todo salió bien (res.ok fue true), devolvemos el JSON de éxito        
         return await res.json();
     }
 
