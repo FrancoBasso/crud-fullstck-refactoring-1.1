@@ -13,6 +13,34 @@ require_once("./repositories/studentsSubjects.php");
 
 function handleGet($conn) 
 {
+    header('Content-Type: application/json');
+
+    if (isset($_GET['student_id']) && isset($_GET['subject_id'])) {
+        $student_id = (int) $_GET['student_id'];
+        $subject_id = (int) $_GET['subject_id'];
+
+        if ($student_id <= 0 || $subject_id <= 0) {
+            echo json_encode(["error" => "Parámetros inválidos"]);
+            return;
+        }
+
+        $stmt = $conn->prepare("SELECT 1 FROM students_subjects WHERE student_id = ? AND subject_id = ? LIMIT 1");
+        if (!$stmt) {
+            echo json_encode(["error" => $conn->error]);
+            return;
+        }
+
+        $stmt->bind_param("ii", $student_id, $subject_id);
+        $stmt->execute();
+        $stmt->store_result();
+
+        $exists = $stmt->num_rows > 0;
+
+        $stmt->close();
+
+        echo json_encode(["exists" => $exists]);
+        return;
+    }
 
      if (isset($_GET['id'])) 
     {
