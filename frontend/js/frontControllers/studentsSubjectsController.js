@@ -69,28 +69,15 @@ function setupFormHandler()
         try 
         {
 
-            const allRelations = await studentsSubjectsAPI.fetchAll();
-            
-            if (relation.id) {
-                if (relationExists(allRelations, relation.student_id, relation.subject_id, relation.id)) {
-                    showError('La asignación ya existe (otra relación con ese estudiante y materia).');
-                     return;
-                }
-            } else {
-                if (relationExists(allRelations, relation.student_id, relation.subject_id)) {
-                    showError('La asignación ya existe');
-                    return;
-                }
+            const { exists } = await studentsSubjectsAPI.exists(relation.student_id, relation.subject_id);
+
+            if (exists) {
+                showError('La asignación ya existe');
+                return;
             }
 
-            if (relation.id) 
-            {
-                await studentsSubjectsAPI.update(relation);
-            } 
-            else 
-            {
-                await studentsSubjectsAPI.create(relation);
-            }
+            await studentsSubjectsAPI.create(relation);
+
             clearForm();
             loadRelations();
         } 
@@ -99,14 +86,6 @@ function setupFormHandler()
             console.error('Error guardando relación:', err.message);
         }
     });
-}
-
-function relationExists(list, student_id, subject_id, excludeId = null) {
-    return list.some(rel =>
-        rel.student_id === student_id &&
-        rel.subject_id === subject_id &&
-        rel.id !== excludeId
-    );
 }
 
 function showError(message) {

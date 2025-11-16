@@ -9,7 +9,7 @@
 */
 
 import { createAPI } from './apiFactory.js';
-export const studentsSubjectsAPI = createAPI('studentsSubjects');
+const baseAPI = createAPI('studentsSubjects');
 
 /**
  * Ejemplo de extensión de la API:
@@ -37,3 +37,37 @@ export const studentsSubjectsAPI = createAPI('studentsSubjects');
 // {
 //     urlOverride: '../../backend/misRutas/personalizadas.php'
 // });
+
+
+export const studentsSubjectsAPI = {
+    ...baseAPI, // hereda fetchAll, create, update, remove, etc.
+
+    /**
+     *
+     * @param {number|string} studentId
+     * @param {number|string} subjectId
+     * @returns {Promise<Object>} -> { exists: boolean } (o lanza error)
+     */
+    async exists(studentId, subjectId) {
+        const params = new URLSearchParams({
+            student_id: studentId,
+            subject_id: subjectId
+        });
+
+        const url = `../../backend/server.php?module=studentsSubjects&${params.toString()}`;
+
+        const res = await fetch(url, {
+            method: 'GET',
+            credentials: 'same-origin' // mantener si usás sesión/cookies en el backend
+        });
+
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error('Error al validar existencia: ' + text);
+        }
+
+        const json = await res.json();
+        if (json.error) throw new Error(json.error);
+        return json;
+    }
+};
