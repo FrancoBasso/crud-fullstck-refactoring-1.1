@@ -120,7 +120,20 @@ function handlePut($conn)
 function handleDelete($conn) 
 {
     $input = json_decode(file_get_contents("php://input"), true);
+//validacion en el back   
+    $assignments = getStudentAssignments($conn, $input['id']);
 
+    if (count($assignments) > 0) {
+        $names = array_column($assignments, 'name');
+        $msg = "No se puede eliminar: el estudiante está asignado a la(s) materia(s): " . implode(", ", $names);
+
+        http_response_code(409);
+        echo json_encode([
+            "error" => $msg,
+            "assignments" => $assignments 
+        ]);
+        return;
+    }
     $result = deleteStudent($conn, $input['id']);
     if ($result['deleted'] > 0) 
     {

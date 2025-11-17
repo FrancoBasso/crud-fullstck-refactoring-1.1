@@ -72,6 +72,24 @@ function createStudent($conn, $fullname, $email, $age)
         'id' => $conn->insert_id
     ];
 }
+// //punto 4 tep7
+
+function getStudentAssignments($conn, $student_id) 
+{
+    $sql = "SELECT sub.id, sub.name
+            FROM students_subjects ss
+            JOIN subjects sub ON ss.subject_id = sub.id
+            WHERE ss.student_id = ?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $student_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+
 
 function updateStudent($conn, $id, $fullname, $email, $age) 
 {

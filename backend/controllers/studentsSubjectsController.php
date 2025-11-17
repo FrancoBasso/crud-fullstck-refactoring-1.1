@@ -84,7 +84,6 @@ function handlePut($conn)
 function handleDelete($conn) 
 {
     $input = json_decode(file_get_contents("php://input"), true);
-
     $result = removeStudentSubject($conn, $input['id']);
     if ($result['deleted'] > 0) 
     {

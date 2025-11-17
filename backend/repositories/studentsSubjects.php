@@ -53,14 +53,32 @@ function getSubjectsByStudent($conn, $student_id)
 
     return $result->fetch_all(MYSQLI_ASSOC); 
 }
-//2.0
+// //2.0
+// function getPaginatedStudentSubjects($conn, $limit, $offset) 
+// {
+//     $stmt = $conn->prepare("SELECT * FROM students_subjects LIMIT ? OFFSET ?");
+//     $stmt->bind_param("ii", $limit, $offset);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+//     return $result->fetch_all(MYSQLI_ASSOC);
+// }
 function getPaginatedStudentSubjects($conn, $limit, $offset) 
 {
-    $stmt = $conn->prepare("SELECT * FROM students_subjects LIMIT ? OFFSET ?");
+    $sql = "SELECT ss.id,
+                   ss.student_id,
+                   ss.subject_id,
+                   ss.approved,
+                   s.fullname AS student_fullname,
+                   sub.name AS subject_name
+            FROM students_subjects ss
+            JOIN students s ON ss.student_id = s.id
+            JOIN subjects sub ON ss.subject_id = sub.id
+            LIMIT ? OFFSET ?";
+    
+    $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $limit, $offset);
     $stmt->execute();
-    $result = $stmt->get_result();
-    return $result->fetch_all(MYSQLI_ASSOC);
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 }
 
 //2.0
