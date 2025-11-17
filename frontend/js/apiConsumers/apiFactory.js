@@ -23,7 +23,7 @@ export function createAPI(moduleName, config = {})
 
         /* if (!res.ok) throw new Error(`Error en ${method}`); */
         if (!res.ok) 
-        {
+         { 
             let errorData;
             try {
                 // 1. Intentamos leer el JSON que nos mandó el backend
@@ -34,8 +34,8 @@ export function createAPI(moduleName, config = {})
             }
             
             // 3. Lanzamos el error con el mensaje del backend
-            throw new Error(errorData.error || `Error en ${method}`);
-        }
+            throw new Error(errorData.error || `Error en ${method}`); 
+        } 
 
         // 4. Si todo salió bien (res.ok fue true), devolvemos el JSON de éxito        
         return await res.json();
