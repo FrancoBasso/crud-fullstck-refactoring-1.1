@@ -9,7 +9,8 @@
 */
 
 import { studentsAPI } from '../apiConsumers/studentsAPI.js';
-
+import { showErrorBox } from './ControllerFunction.js'; 
+import { showConfirmBox } from './ControllerFunction.js'; 
 //2.0
 //For pagination:
 let currentPage = 1;
@@ -147,7 +148,7 @@ function createCell(text)
     td.textContent = text;
     return td;
 }
-  
+
 function createActionsCell(student)
 {
     const td = document.createElement('td');
@@ -156,11 +157,10 @@ function createActionsCell(student)
     editBtn.textContent = 'Editar';
     editBtn.className = 'w3-button w3-blue w3-small';
     editBtn.addEventListener('click', () => fillForm(student));
-  
-    const deleteBtn = document.createElement('button');
+    const deleteBtn = document.createElement('button');  
     deleteBtn.textContent = 'Borrar';
     deleteBtn.className = 'w3-button w3-red w3-small w3-margin-left';
-    deleteBtn.addEventListener('click', () => confirmDelete(student.id));
+    deleteBtn.addEventListener('click', () => showConfirmBox(student.id,"Desea eliminar este estudiante?"));
   
     td.appendChild(editBtn);
     td.appendChild(deleteBtn);
@@ -175,18 +175,49 @@ function fillForm(student)
     document.getElementById('age').value = student.age;
 }
   
+const deleteBtn = document.getElementById('botonConfirmar');
+const confirmBox = document.getElementById('confirmDeleteBox');
+
+//accion para el boton de eliminar
+  deleteBtn.addEventListener('click', async () => {
+   
+    const idToDelete = deleteBtn.dataset.currentId; 
+
+    if (idToDelete) {
+       
+        await confirmDelete(idToDelete);
+    }
+
+    // 5. Ocultar la caja de confirmación (siempre)
+    confirmBox.style.display = 'none';
+
+    // Opcional: limpiar el atributo después de usar
+    deleteBtn.dataset.currentId = ''; 
+});
 async function confirmDelete(id) 
 {
-    if (!confirm('¿Estás seguro que deseas borrar este estudiante?')) return;
-  
     try 
     {
-        await studentsAPI.remove(id);
+        const { res, body } = await studentsAPI.removeWithResponse(id);
+
+        if (!res.ok) 
+        {
+            if (res.status === 409) {
+                showErrorBox(body?.error || "No se puede eliminar: conflicto.");
+                return;
+            }
+
+            showErrorBox(body?.error || `Error ${res.status} al eliminar.`);
+            return;
+        }
+
+        // OK
         loadStudents();
-    } 
+    }
     catch (err) 
     {
-        console.error('Error al borrar:', err.message);
+        console.error("Error de red:", err);
+        showErrorBox("Error de red al intentar eliminar.");
     }
 }
-  
+
