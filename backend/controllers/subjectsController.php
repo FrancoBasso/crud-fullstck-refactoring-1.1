@@ -84,18 +84,13 @@ function handlePut($conn)
     $input = json_decode(file_get_contents("php://input"), true);
 
     // --- 1. VALIDACIONES BÁSICAS ---
-   /* if (empty($input['id']) || empty($input['name']) || empty($input['credits'])) {
+    if (empty($input['id']) || empty($input['name'])) {
         http_response_code(400); 
         echo json_encode(["error" => "Faltan datos obligatorios"]);
         return;
     }
-     if (!is_numeric($input['credits']) || $input['credits'] <= 0) {
-        http_response_code(400);
-        echo json_encode(["error" => "Los créditos deben ser un número positivo"]);
-        return;
-    }*/
 
-    // --- 2. VALIDACIÓN DE UNICIDAD (La lógica corregida para PUT) ---
+
     $existingSubject = getSubjectByName($conn, $input['name']);
 
     // ¡Error! si el nombre existe Y el ID es DIFERENTE al mío
