@@ -7,7 +7,7 @@
 *    Status      : Prototype
 *    Iteration   : 1.0 ( prototype )
 */
-
+import {showErrorBox} from './ControllerFunction.js';
 import { subjectsAPI } from '../apiConsumers/subjectsAPI.js';
 //2.0
 //For pagination:
@@ -52,7 +52,9 @@ function setupSubjectFormHandler()
         }
         catch (err)
         {
-            console.error(err.message);
+           console.error(err.message); 
+           /* alert('Error: ' + err.message);  */
+           showErrorBox(err.message);
         }
   });
 }

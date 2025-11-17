@@ -45,6 +45,28 @@ function handlePost($conn)
 {
     $input = json_decode(file_get_contents("php://input"), true);
 
+    /*if (empty($input['name']) || empty($input['credits'])) {
+        http_response_code(400); 
+        echo json_encode(["error" => "Faltan datos obligatorios (nombre, créditos)"]);
+        return;
+    }
+    if (!is_numeric($input['credits']) || $input['credits'] <= 0) {
+        http_response_code(400);
+        echo json_encode(["error" => "Los créditos deben ser un número positivo"]);
+        return;
+    }*/
+
+    // --- 2. VALIDACIÓN DE UNICIDAD (Nombre de materia) ---
+    $existingSubject = getSubjectByName($conn, $input['name']);
+    
+    if ($existingSubject) {
+        http_response_code(409); // 409 Conflict
+        echo json_encode(["error" => "El nombre de la materia ya existe"]);
+        return; // ¡Frenamos!
+    }
+    
+    // --- 3. CREAR ---
+    // (Ajustá los parámetros a tu función createSubject)
     $result = createSubject($conn, $input['name']);
     if ($result['inserted'] > 0) 
     {
@@ -61,6 +83,26 @@ function handlePut($conn)
 {
     $input = json_decode(file_get_contents("php://input"), true);
 
+    // --- 1. VALIDACIONES BÁSICAS ---
+    if (empty($input['id']) || empty($input['name'])) {
+        http_response_code(400); 
+        echo json_encode(["error" => "Faltan datos obligatorios"]);
+        return;
+    }
+
+
+    $existingSubject = getSubjectByName($conn, $input['name']);
+
+    // ¡Error! si el nombre existe Y el ID es DIFERENTE al mío
+    if ($existingSubject && $existingSubject['id'] != $input['id']) {
+        http_response_code(409); 
+        echo json_encode(["error" => "Ese nombre ya está en uso por otra materia"]);
+        return;
+    }
+    
+    // --- 3. ACTUALIZAR ---
+    // (Ajustá los parámetros a tu función updateSubject)
+        
     $result = updateSubject($conn, $input['id'], $input['name']);
     if ($result['updated'] > 0) 
     {
