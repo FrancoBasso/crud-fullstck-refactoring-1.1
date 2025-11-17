@@ -42,9 +42,30 @@ function handleGet($conn)
     }
 }
 
-function handlePost($conn) 
+function handlePost($conn) //edit
 {
     $input = json_decode(file_get_contents("php://input"), true);
+
+    if (!filter_var($input['age'], FILTER_VALIDATE_INT) || $input['age'] < 18) {
+        http_response_code(400); 
+        echo json_encode(["error" => "La edad debe ser un número entero y mayor de 17 años."]);
+        return; 
+    }
+
+    if (empty($input['fullname']) || empty($input['email']) || empty($input['age'])) {
+        http_response_code(400); 
+        echo json_encode(["error" => "Todos los campos  son obligatorios."]);
+        return; 
+    }
+       
+    $existingStudent = getStudentByEmail($conn, $input['email']);
+    
+    if ($existingStudent) {
+        // 409 Conflict - Es el código correcto para "recurso ya existe"
+        http_response_code(409); 
+        echo json_encode(["error" => "El email ya está registrado"]);
+        return; // Cortamos la ejecución
+    }
 
     $result = createStudent($conn, $input['fullname'], $input['email'], $input['age']);
     if ($result['inserted'] > 0) 
@@ -61,6 +82,28 @@ function handlePost($conn)
 function handlePut($conn) 
 {
     $input = json_decode(file_get_contents("php://input"), true);
+
+    if (!filter_var($input['age'], FILTER_VALIDATE_INT) || $input['age'] < 18) {
+        http_response_code(400); 
+        echo json_encode(["error" => "La edad debe ser un número entero y mayor de 17 años."]);
+        return; 
+    }
+    
+    if (empty($input['fullname']) || empty($input['email']) || empty($input['age'])) {
+        http_response_code(400); 
+        echo json_encode(["error" => "Todos los campos (ID, nombre, email, edad) son obligatorios."]);
+        return; 
+    }
+
+
+    $existingStudent = getStudentByEmail($conn, $input['email']);
+    
+    if ($existingStudent) {
+        // 409 Conflict - Es el código correcto para "recurso ya existe"
+        http_response_code(409); 
+        echo json_encode(["error" => "El email ya está registrado"]);
+        return; // Cortamos la ejecución
+    }
 
     $result = updateStudent($conn, $input['id'], $input['fullname'], $input['email'], $input['age']);
     if ($result['updated'] > 0) 
