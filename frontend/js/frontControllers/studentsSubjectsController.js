@@ -72,7 +72,7 @@ function setupFormHandler()
             const { exists } = await studentsSubjectsAPI.exists(relation.student_id, relation.subject_id);
 
             if (exists) {
-                showError('La asignación ya existe');
+                showErrorBox('La asignación ya existe');
                 return;
             }
 
@@ -88,9 +88,6 @@ function setupFormHandler()
     });
 }
 
-function showError(message) {
-    alert(message);
-}
 
 function setupCancelHandler()
 {
