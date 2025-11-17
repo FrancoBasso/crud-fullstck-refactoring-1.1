@@ -14,7 +14,7 @@ export function createAPI(moduleName, config = {})
 
     async function sendJSON(method, data) 
     {
-        const res = await fetch(API_URL,
+         const res = await fetch(API_URL,
         {
             method,
             headers: { 'Content-Type': 'application/json' },

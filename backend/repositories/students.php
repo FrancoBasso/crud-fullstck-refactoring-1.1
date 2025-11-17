@@ -45,6 +45,17 @@ function getStudentById($conn, $id)
     //fetch_assoc() devuelve un array asociativo ya listo para convertir en JSON de una fila:
     return $result->fetch_assoc(); 
 }
+//modificado
+function getStudentByEmail($conn, $email) 
+{
+    $stmt = $conn->prepare("SELECT * FROM students WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    // fetch_assoc() devuelve null automáticamente si no hay filas
+    return $result->fetch_assoc(); 
+}
 
 function createStudent($conn, $fullname, $email, $age) 
 {

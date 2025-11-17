@@ -49,6 +49,7 @@ function setupFormHandler()
         catch (err)
         {
             console.error(err.message);
+            showErrorBox('Error: ' + err.message);
         }
     });
 }
@@ -219,5 +220,7 @@ async function confirmDelete(id)
         console.error("Error de red:", err);
         showErrorBox("Error de red al intentar eliminar.");
     }
+
+    
 }
 
