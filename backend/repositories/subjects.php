@@ -69,7 +69,21 @@ function createSubject($conn, $name)
         'id' => $conn->insert_id
     ];
 }
+//validacion ej 3
+function getSubjectAssignments($conn, $subject_id) 
+{
+    $sql = "SELECT st.id, st.fullname
+            FROM students_subjects ss
+            JOIN students st ON ss.student_id = st.id
+            WHERE ss.subject_id = ?";
 
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $subject_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
 function updateSubject($conn, $id, $name) 
 {
     $sql = "UPDATE subjects SET name = ? WHERE id = ?";

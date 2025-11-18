@@ -9,6 +9,7 @@
 */
 import {showErrorBox} from './ControllerFunction.js';
 import { subjectsAPI } from '../apiConsumers/subjectsAPI.js';
+import {showConfirmBox} from './ControllerFunction.js';
 //2.0
 //For pagination:
 let currentPage = 1;
@@ -20,7 +21,25 @@ document.addEventListener('DOMContentLoaded', () =>
     setupSubjectFormHandler();
     setupCancelHandler();
     setupPaginationControls();//2.0
-    
+    const deleteBtn = document.getElementById('botonConfirmar');
+    const confirmBox = document.getElementById('confirmDeleteBox');
+
+    //accion para el boton de eliminar
+    deleteBtn.addEventListener('click', async () => {
+   
+    const idToDelete = deleteBtn.dataset.currentId; 
+
+    if (idToDelete) {
+       
+        await confirmDeleteSubjects(idToDelete);
+    }
+
+    // 5. Ocultar la caja de confirmación (siempre)
+    confirmBox.style.display = 'none';
+
+    // Opcional: limpiar el atributo después de usar
+    deleteBtn.dataset.currentId = ''; 
+});
 });
 
 function setupSubjectFormHandler() 
@@ -102,7 +121,7 @@ async function loadSubjects()
         const resPerPage = parseInt(document.getElementById('resultsPerPage').value, 10) || limit;
         const data = await subjectsAPI.fetchPaginated(currentPage, resPerPage);
         console.log(data);
-        const subjects = await subjectsAPI.fetchAll();
+        // const subjects = await subjectsAPI.fetchAll();
         renderSubjectTable(data.subjects);
         totalPages = Math.ceil(data.total / resPerPage);
         document.getElementById('pageInfo').textContent = `Página ${currentPage} de ${totalPages}`;
@@ -153,24 +172,33 @@ function createSubjectActionsCell(subject)
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = 'Borrar';
     deleteBtn.className = 'w3-button w3-red w3-small w3-margin-left';
-    deleteBtn.addEventListener('click', () => confirmDeleteSubject(subject.id));
+    deleteBtn.addEventListener('click', () => showConfirmBox(subject.id, "Desea eliminar esta materia?")
+);
 
     td.appendChild(editBtn);
     td.appendChild(deleteBtn);
     return td;
 }
 
-async function confirmDeleteSubject(id)
-{
-    if (!confirm('¿Seguro que deseas borrar esta materia?')) return;
+async function confirmDeleteSubjects(id) {
+    const { res, body } = await subjectsAPI.removeWithResponse(id);
 
-    try
-    {
-        await subjectsAPI.remove(id);
-        loadSubjects();
+    if (res.status === 409) {
+        if (body.assignments?.length > 0) {
+            const names = body.assignments
+                .map(a => a.fullname)
+                .join(', ');
+            showErrorBox(`No se puede eliminar la materia: está asignada a ${names}`);
+        } else {
+            showErrorBox(body.error);
+        }
+        return;
     }
-    catch (err)
-    {
-        console.error('Error al borrar materia:', err.message);
+
+    if (!res.ok) {
+        showErrorBox(body.error || "Error eliminando materia.");
+        return;
     }
+
+    loadSubjects();
 }

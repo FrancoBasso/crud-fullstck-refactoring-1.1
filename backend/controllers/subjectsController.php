@@ -117,8 +117,28 @@ function handlePut($conn)
 
 function handleDelete($conn) 
 {
-    $input = json_decode(file_get_contents("php://input"), true);
     
+    $input = json_decode(file_get_contents("php://input"), true);
+
+    $assignments = getSubjectAssignments($conn, $input['id']);
+
+    if (count($assignments) > 0) {
+
+        // Mostrar nombre y apellido de estudiantes
+        $names = array_map(function($a) {
+            return $a['fullname'];
+        }, $assignments);
+
+        $msg = "No se puede eliminar: la materia está asignada al/los estudiante(s): " 
+       . implode(", ", $names);
+        http_response_code(409);
+        echo json_encode([
+            "error" => $msg,
+            "assignments" => $assignments
+        ]);
+        return;
+    }
+
     $result = deleteSubject($conn, $input['id']);
     if ($result['deleted'] > 0) 
     {
